@@ -8,19 +8,25 @@ describe Oystercard do
   end
 
   describe '#top_up' do
-    it 'allows user to add money to card' do
-      expect(subject.top_up(10)).to eq(10)
+    it { is_expected.to respond_to(:top_up).with(1).argument }
+
+    it 'should top up the card' do
+      expect{ subject.top_up(10) }.to change{ subject.balance }.by 10
     end
 
-    it 'saves balance to be topped up multiple times' do
-      subject.top_up(10)
-      expect(subject.top_up(10)).to eq(20)
-    end
-
-    it 'raises an error if balance is more than £90' do
+    it 'raises an error if balance exceeds maximum limit' do
       maximum_limit = Oystercard::MAXIMUM_LIMIT
       subject.top_up(maximum_limit)
       expect { subject.top_up(1) }.to raise_error "Balance is limited to £#{maximum_limit}"
+    end
+  end
+
+  describe '#deduct' do
+    it { is_expected.to respond_to(:deduct).with(1).argument }
+
+    it 'should deduct from the card' do
+      subject.top_up(20)
+      expect{ subject.deduct(10) }.to change{ subject.balance }.by -10
     end
   end
 end
