@@ -21,34 +21,32 @@ describe Oystercard do
     end
   end
 
-  # describe '#deduct' do
-  #   it { is_expected.to respond_to(:deduct).with(1).argument }
-
-  #   it 'should deduct from the card' do
-  #     subject.top_up(20)
-  #     expect{ subject.deduct(10) }.to change{ subject.balance }.by -10
-  #   end
-  # end
-
   describe '#touch_in' do
+    let(:station) { double :station }
     it { is_expected.to respond_to(:touch_in) }
 
-    it "should confirm it is in use" do
+    it "should return station" do
       subject.top_up(Oystercard::MINIMUM_FARE)
-      expect(subject.touch_in).to eq(true)
+      expect(subject.touch_in(station)).to eq(station)
     end
 
     it "should raise error if there are insufficient funds" do
-      expect { subject.touch_in }.to raise_error "Insufficient funds"
+      expect { subject.touch_in(station) }.to raise_error "Insufficient funds"
+    end
+
+    it "should remember the entry station" do
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      expect { subject.touch_in(station) }.to change { subject.entry_station }.from(nil).to(station)
     end
   end
 
   describe '#in_journey?' do
+    let(:station) { double :station }
     it { is_expected.to respond_to(:in_journey?) }
 
     it "should return true if touched in but not tapped out" do
       subject.top_up(Oystercard::MINIMUM_FARE)
-      subject.touch_in
+      subject.touch_in(station)
       expect(subject.in_journey?).to eq(true)
     end
 
@@ -64,13 +62,8 @@ describe Oystercard do
   end
 
   describe '#touch_out' do
+    let(:station) { double :station }
     it { is_expected.to respond_to(:touch_out) }
-
-    it "should confirm it is no longer in use" do
-      subject.top_up(Oystercard::MINIMUM_FARE)
-      subject.touch_in
-      expect(subject.touch_out).to eq(false)
-    end
 
     it "should deduct the fare from the balance" do
       subject.top_up(Oystercard::MINIMUM_FARE)
