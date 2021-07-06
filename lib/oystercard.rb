@@ -12,10 +12,6 @@ class Oystercard
     @balance += amount
   end
 
-  def deduct(amount)
-    @balance -= amount
-  end
-
   def in_journey?
     !!@in_journey
   end
@@ -34,5 +30,9 @@ class Oystercard
 
   def over_limit?(amount)
     @balance + amount > MAXIMUM_LIMIT
+  end
+
+  def deduct(amount)
+    @balance -= amount
   end
 end
