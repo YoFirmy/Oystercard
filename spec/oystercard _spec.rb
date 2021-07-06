@@ -29,4 +29,47 @@ describe Oystercard do
       expect{ subject.deduct(10) }.to change{ subject.balance }.by -10
     end
   end
+
+  describe '#touch_in' do
+    it { is_expected.to respond_to(:touch_in) }
+
+    it "should confirm it is in use" do
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      expect(subject.touch_in).to eq(true)
+    end
+
+    it "should raise error if there are insufficient funds" do
+      expect { subject.touch_in }.to raise_error "Insufficient funds"
+    end
+  end
+
+  describe '#in_journey?' do
+    it { is_expected.to respond_to(:in_journey?) }
+
+    it "should return true if touched in but not tapped out" do
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      subject.touch_in
+      expect(subject.in_journey?).to eq(true)
+    end
+
+    it "should return false if touched out" do
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      subject.touch_out
+      expect(subject.in_journey?).to eq(false)
+    end
+
+    it "should return false if it hasn't been used yet" do
+      expect(subject.in_journey?).to eq(false)
+    end
+  end
+
+  describe '#touch_out' do
+    it { is_expected.to respond_to(:touch_out) }
+
+    it "should confirm it is no longer in use" do
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      subject.touch_in
+      expect(subject.touch_out).to eq(false)
+    end
+  end
 end
