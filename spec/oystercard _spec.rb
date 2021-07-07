@@ -44,7 +44,7 @@ describe Oystercard do
     let(:station) { double :station }
     it { is_expected.to respond_to(:in_journey?) }
 
-    it "should return true if touched in but not tapped out" do
+    it "should return true if touched in but not touched out" do
       subject.top_up(Oystercard::MINIMUM_FARE)
       subject.touch_in(station)
       expect(subject.in_journey?).to eq(true)
@@ -52,7 +52,7 @@ describe Oystercard do
 
     it "should return false if touched out" do
       subject.top_up(Oystercard::MINIMUM_FARE)
-      subject.touch_out
+      subject.touch_out(station)
       expect(subject.in_journey?).to eq(false)
     end
 
@@ -67,7 +67,23 @@ describe Oystercard do
 
     it "should deduct the fare from the balance" do
       subject.top_up(Oystercard::MINIMUM_FARE)
-      expect { subject.touch_out }.to change { subject.balance }.by(-Oystercard::MINIMUM_FARE)
+      expect { subject.touch_out(station) }.to change { subject.balance }.by(-Oystercard::MINIMUM_FARE)
+    end
+
+    it "should remember the exit station" do
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      exit_station = double(:station)
+      expect { subject.touch_out(exit_station) }.to change { subject.exit_station }.from(nil).to(exit_station)
+    end
+  end
+  
+  describe "#previous_trips" do
+    it { is_expected.to respond_to(:previous_trips)}
+  end
+
+  describe "#journeys" do
+    it "has an empty list of journeys by default" do
+      expect(subject.journeys).to be_empty
     end
   end
 end
