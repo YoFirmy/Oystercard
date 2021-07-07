@@ -85,5 +85,15 @@ describe Oystercard do
     it "has an empty list of journeys by default" do
       expect(subject.journeys).to be_empty
     end
+
+    
+
+    it "stores an entry and exit station" do
+      entry_station = double(:station)
+      exit_station = double(:station)
+      subject.top_up(Oystercard::MINIMUM_FARE)
+      subject.touch_in(entry_station)
+      expect { subject.touch_out(exit_station) }.to change {subject.journeys}.from({}).to({entry_station => exit_station})
+    end
   end
 end

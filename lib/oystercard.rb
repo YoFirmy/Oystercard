@@ -9,7 +9,7 @@ class Oystercard
 
   def initialize
     @balance = 0
-    @journeys = []
+    @journeys = {}
   end
 
   def top_up(amount)
@@ -28,6 +28,7 @@ class Oystercard
   
   def touch_out(station)
     @exit_station = station
+    update_journeys
     deduct(MINIMUM_FARE)
   end
 
@@ -35,6 +36,10 @@ class Oystercard
   end
 
   private
+
+  def update_journeys
+    @journeys[@entry_station] = @exit_station
+  end
 
   def over_limit?(amount)
     @balance + amount > MAXIMUM_LIMIT
