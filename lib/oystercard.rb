@@ -32,9 +32,6 @@ class Oystercard
     deduct(MINIMUM_FARE)
   end
 
-  def previous_trips
-  end
-
   private
 
   def update_journeys

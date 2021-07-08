@@ -23,6 +23,6 @@ describe Station do
       station = Station.new(name)
       station.zone = zone
       expect(station.zone).to eq(zone)
-    end  
+    end
   end
 end

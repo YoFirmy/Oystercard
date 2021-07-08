@@ -76,10 +76,6 @@ describe Oystercard do
       expect { subject.touch_out(exit_station) }.to change { subject.exit_station }.from(nil).to(exit_station)
     end
   end
-  
-  describe "#previous_trips" do
-    it { is_expected.to respond_to(:previous_trips)}
-  end
 
   describe "#journeys" do
     it "has an empty list of journeys by default" do
