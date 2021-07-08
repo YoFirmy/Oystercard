@@ -23,73 +23,47 @@ describe Oystercard do
 
   describe '#touch_in' do
     let(:station) { double :station }
+
     it { is_expected.to respond_to(:touch_in) }
 
-    it "should return station" do
-      subject.top_up(Oystercard::MINIMUM_FARE)
-      expect(subject.touch_in(station)).to eq(station)
+    it "should return new journey created" do
+      subject.top_up(Oystercard::MAXIMUM_LIMIT)
+      expect(subject.touch_in(station)).to be_instance_of(Journey)
     end
 
     it "should raise error if there are insufficient funds" do
       expect { subject.touch_in(station) }.to raise_error "Insufficient funds"
     end
-
-    it "should remember the entry station" do
-      subject.top_up(Oystercard::MINIMUM_FARE)
-      expect { subject.touch_in(station) }.to change { subject.entry_station }.from(nil).to(station)
-    end
-  end
-
-  describe '#in_journey?' do
-    let(:station) { double :station }
-    it { is_expected.to respond_to(:in_journey?) }
-
-    it "should return true if touched in but not touched out" do
-      subject.top_up(Oystercard::MINIMUM_FARE)
-      subject.touch_in(station)
-      expect(subject.in_journey?).to eq(true)
-    end
-
-    it "should return false if touched out" do
-      subject.top_up(Oystercard::MINIMUM_FARE)
-      subject.touch_out(station)
-      expect(subject.in_journey?).to eq(false)
-    end
-
-    it "should return false if it hasn't been used yet" do
-      expect(subject.in_journey?).to eq(false)
-    end
   end
 
   describe '#touch_out' do
-    let(:station) { double :station }
+    let(:entry_station) { double :station }
+    let(:exit_station) { double :station }
+
+    before do
+      subject.top_up(Oystercard::MAXIMUM_LIMIT)
+      subject.touch_in(entry_station)
+    end
+
     it { is_expected.to respond_to(:touch_out) }
 
     it "should deduct the fare from the balance" do
-      subject.top_up(Oystercard::MINIMUM_FARE)
-      expect { subject.touch_out(station) }.to change { subject.balance }.by(-Oystercard::MINIMUM_FARE)
+      expect { subject.touch_out(exit_station) }.to change { subject.balance }.by(-Oystercard::MINIMUM_FARE)
     end
 
-    it "should remember the exit station" do
-      subject.top_up(Oystercard::MINIMUM_FARE)
-      exit_station = double(:station)
-      expect { subject.touch_out(exit_station) }.to change { subject.exit_station }.from(nil).to(exit_station)
+    it "stores the exit station for journey" do
+      expect { subject.touch_out(exit_station) }.to change { subject.journeys[0] }.from(nil).to be_a Journey
+    end
+
+    it "should set current journey back to nil" do
+      subject.touch_out(exit_station)
+      expect(subject.current_journey).to eq(nil)
     end
   end
 
   describe "#journeys" do
     it "has an empty list of journeys by default" do
       expect(subject.journeys).to be_empty
-    end
-
-    
-
-    it "stores an entry and exit station" do
-      entry_station = double(:station)
-      exit_station = double(:station)
-      subject.top_up(Oystercard::MINIMUM_FARE)
-      subject.touch_in(entry_station)
-      expect { subject.touch_out(exit_station) }.to change {subject.journeys}.from({}).to({entry_station => exit_station})
     end
   end
 end
