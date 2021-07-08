@@ -18,9 +18,7 @@ class Oystercard
   end
 
   def touch_in(station)
-    # seperation of concern?
-    fail "Insufficient funds" if @balance < MINIMUM_FARE
-    
+    fail "Insufficient funds" if insufficient_funds?
     deduct(@current_journey.fare) if @current_journey
     @current_journey = Journey.new(station)
   end
@@ -33,12 +31,12 @@ class Oystercard
 
   private
 
+  def insufficient_funds?
+    @balance < MINIMUM_FARE
+  end
+
   def finish_current_journey(station)
-    if @current_journey
-      @current_journey.complete_journey(station)
-    else
-      @current_journey = Journey.new
-    end
+    @current_journey ? @current_journey.complete_journey(station) : @current_journey = Journey.new
   end
 
   def update_journeys

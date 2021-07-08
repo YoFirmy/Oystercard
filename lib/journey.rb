@@ -13,10 +13,12 @@ class Journey
   end
 
   def fare
-    if @entry_station && @exit_station
-      Oystercard::MINIMUM_FARE
-    else
-      Oystercard::PENALTY_CHARGE
-    end
+    penalty? ? Oystercard::MINIMUM_FARE : Oystercard::PENALTY_CHARGE
+  end
+
+  private
+
+  def penalty?
+    @entry_station && @exit_station
   end
 end
