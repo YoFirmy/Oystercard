@@ -42,12 +42,13 @@ describe Oystercard do
 
     before do
       subject.top_up(Oystercard::MAXIMUM_LIMIT)
-      subject.touch_in(entry_station)
+      # subject.touch_in(entry_station)
     end
 
     it { is_expected.to respond_to(:touch_out) }
 
     it "should deduct the fare from the balance" do
+      subject.touch_in(entry_station)
       expect { subject.touch_out(exit_station) }.to change { subject.balance }.by(-Oystercard::MINIMUM_FARE)
     end
 
@@ -58,6 +59,10 @@ describe Oystercard do
     it "should set current journey back to nil" do
       subject.touch_out(exit_station)
       expect(subject.current_journey).to eq(nil)
+    end
+
+    it "should give a penalty if didnt previously touch in" do
+      expect { subject.touch_out(exit_station) }.to change { subject.balance }.by(-Oystercard::PENALTY_CHARGE)
     end
   end
 

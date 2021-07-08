@@ -5,6 +5,7 @@ class Oystercard
 
   MAXIMUM_LIMIT = 90
   MINIMUM_FARE = 1
+  PENALTY_CHARGE = 6
 
   def initialize
     @balance = 0
@@ -17,17 +18,26 @@ class Oystercard
   end
 
   def touch_in(station)
+    # seperation of concern?
     fail "Insufficient funds" if @balance < MINIMUM_FARE
     @current_journey = Journey.new(station)
   end
   
   def touch_out(station)
-    @current_journey.complete_journey(station)
+    finish_current_journey(station)
+    deduct(@current_journey.fare)
     update_journeys
-    deduct(MINIMUM_FARE)
   end
 
   private
+
+  def finish_current_journey(station)
+    if @current_journey
+      @current_journey.complete_journey(station)
+    else
+      @current_journey = Journey.new
+    end
+  end
 
   def update_journeys
     @journeys << @current_journey
