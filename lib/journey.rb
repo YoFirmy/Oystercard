@@ -13,7 +13,7 @@ class Journey
   end
 
   def fare
-    if @entry_station
+    if @entry_station && @exit_station
       Oystercard::MINIMUM_FARE
     else
       Oystercard::PENALTY_CHARGE

@@ -34,6 +34,12 @@ describe Oystercard do
     it "should raise error if there are insufficient funds" do
       expect { subject.touch_in(station) }.to raise_error "Insufficient funds"
     end
+
+    it 'gives penalty charge if tapped in twice' do
+      subject.top_up(Oystercard::MAXIMUM_LIMIT)
+      subject.touch_in(station)
+      expect{subject.touch_in(station)}.to change { subject.balance }.by (-Oystercard::PENALTY_CHARGE)
+    end
   end
 
   describe '#touch_out' do
