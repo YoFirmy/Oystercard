@@ -19,11 +19,13 @@ class Oystercard
 
   def touch_in(station)
     fail "Insufficient funds" if insufficient_funds?
+    # seperation of concerns?
     deduct(@current_journey.fare) if @current_journey
     @current_journey = Journey.new(station)
   end
   
   def touch_out(station)
+    # seperation of concerns?
     finish_current_journey(station)
     deduct(@current_journey.fare)
     update_journeys

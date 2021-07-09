@@ -48,7 +48,6 @@ describe Oystercard do
 
     before do
       subject.top_up(Oystercard::MAXIMUM_LIMIT)
-      # subject.touch_in(entry_station)
     end
 
     it { is_expected.to respond_to(:touch_out) }
